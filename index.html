@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ApexToe | Premium Tic Tac Toe</title>
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Play premium Tic Tac Toe in your browser. Choose between Local PvP or challenge our unbeatable Minimax AI. Features high-end glassmorphism, retro audio synth effects, scoreboard, and move history time-travel.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="index.css">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <!-- Ambient background blobs -->
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="logo-icon">
+          <i data-lucide="gamepad-2"></i>
+        </div>
+        <div class="logo-text">
+          <h1>Apex<span>Toe</span></h1>
+          <p>Tic Tac Toe Reimagined</p>
+        </div>
+      </div>
+      
+      <div class="header-actions">
+        <!-- Sound Toggle -->
+        <button id="sound-toggle" class="btn-icon" aria-label="Toggle Sound" title="Toggle Sound">
+          <i data-lucide="volume-2" class="volume-on-icon"></i>
+          <i data-lucide="volume-x" class="volume-off-icon" style="display: none;"></i>
+        </button>
+        <!-- Theme Toggle -->
+        <button id="theme-toggle" class="btn-icon" aria-label="Toggle Theme" title="Toggle Theme">
+          <i data-lucide="sun" class="sun-icon"></i>
+          <i data-lucide="moon" class="moon-icon"></i>
+        </button>
+      </div>
+    </header>
+
+    <main class="app-content">
+      <!-- SETUP SCREEN -->
+      <section id="setup-screen" class="setup-panel">
+        <div class="card glass-card setup-card">
+          <div class="card-header">
+            <h2>Game Setup</h2>
+            <p class="subtitle">Choose your configuration to start</p>
+          </div>
+          <div class="card-body">
+            <!-- Game Mode -->
+            <div class="form-group">
+              <label>Select Game Mode</label>
+              <div class="toggle-buttons-group">
+                <button type="button" class="btn-toggle active" id="mode-ai" data-mode="ai">
+                  <i data-lucide="cpu"></i>
+                  <span>vs Computer AI</span>
+                </button>
+                <button type="button" class="btn-toggle" id="mode-pvp" data-mode="pvp">
+                  <i data-lucide="users"></i>
+                  <span>Local PvP</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- AI Difficulty (Hidden if PvP) -->
+            <div class="form-group" id="difficulty-group">
+              <label>AI Difficulty Level</label>
+              <div class="toggle-buttons-group select-3">
+                <button type="button" class="btn-toggle active" data-diff="unbeatable">
+                  <span>Unbeatable</span>
+                </button>
+                <button type="button" class="btn-toggle" data-diff="easy">
+                  <span>Easy</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Players Customization -->
+            <div class="players-inputs-container">
+              <div class="input-card" id="player1-card">
+                <span class="player-marker marker-x">X</span>
+                <div class="input-details">
+                  <label for="player1-name">Player 1 Name</label>
+                  <input type="text" id="player1-name" value="Player 1" placeholder="Enter Name" maxlength="12" autocomplete="off">
+                </div>
+              </div>
+              
+              <div class="input-card" id="player2-card">
+                <span class="player-marker marker-o">O</span>
+                <div class="input-details">
+                  <label for="player2-name" id="player2-label">Computer AI</label>
+                  <input type="text" id="player2-name" value="Computer" placeholder="Enter Name" maxlength="12" autocomplete="off">
+                </div>
+              </div>
+            </div>
+
+            <!-- Marker Theme Selection -->
+            <div class="form-group">
+              <label>Choose Color Theme</label>
+              <div class="theme-picker-group">
+                <button type="button" class="theme-option active" data-color-theme="neon" style="--c1: hsl(256, 84%, 64%); --c2: hsl(172, 80%, 50%);" title="Neon Sunset"></button>
+                <button type="button" class="theme-option" data-color-theme="cyber" style="--c1: hsl(350, 85%, 55%); --c2: hsl(200, 85%, 55%);" title="Cyberpunk"></button>
+                <button type="button" class="theme-option" data-color-theme="aurora" style="--c1: hsl(140, 75%, 50%); --c2: hsl(270, 75%, 60%);" title="Aurora"></button>
+                <button type="button" class="theme-option" data-color-theme="royal" style="--c1: hsl(45, 85%, 50%); --c2: hsl(210, 80%, 40%);" title="Royal Gold"></button>
+              </div>
+            </div>
+
+            <button type="button" id="start-game-btn" class="btn-primary">
+              <i data-lucide="play"></i>
+              <span>Start Game</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- GAME SCREEN (Hidden by default) -->
+      <section id="game-screen" class="game-panel hidden">
+        <!-- Left Column: Board and Controls -->
+        <div class="game-main-area">
+          <div class="turn-indicator-bar glass-card">
+            <div class="player-indicator active" id="turn-p1">
+              <span class="ind-marker marker-x">X</span>
+              <span class="ind-name" id="turn-p1-name">Player 1</span>
+            </div>
+            <div class="turn-divider">vs</div>
+            <div class="player-indicator" id="turn-p2">
+              <span class="ind-marker marker-o">O</span>
+              <span class="ind-name" id="turn-p2-name">Computer</span>
+            </div>
+          </div>
+
+          <!-- The Game Board Grid -->
+          <div class="board-container">
+            <div class="board" id="board">
+              <button class="cell" data-index="0" aria-label="Cell 1"></button>
+              <button class="cell" data-index="1" aria-label="Cell 2"></button>
+              <button class="cell" data-index="2" aria-label="Cell 3"></button>
+              <button class="cell" data-index="3" aria-label="Cell 4"></button>
+              <button class="cell" data-index="4" aria-label="Cell 5"></button>
+              <button class="cell" data-index="5" aria-label="Cell 6"></button>
+              <button class="cell" data-index="6" aria-label="Cell 7"></button>
+              <button class="cell" data-index="7" aria-label="Cell 8"></button>
+              <button class="cell" data-index="8" aria-label="Cell 9"></button>
+              
+              <!-- Winner line svg overlay -->
+              <svg class="win-line-svg" id="win-line-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <line class="win-line" id="win-line" x1="0" y1="0" x2="0" y2="0" />
+              </svg>
+            </div>
+          </div>
+
+          <!-- Bottom controls -->
+          <div class="game-controls">
+            <button type="button" id="back-to-setup-btn" class="btn-secondary">
+              <i data-lucide="arrow-left"></i>
+              <span>Setup</span>
+            </button>
+            <button type="button" id="restart-btn" class="btn-primary flex-grow">
+              <i data-lucide="rotate-ccw"></i>
+              <span>Restart Match</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Right Column: Scores and Move Logs -->
+        <div class="game-side-area">
+          <!-- Scoreboard -->
+          <div class="card glass-card score-card">
+            <div class="card-header">
+              <h3><i data-lucide="trophy"></i> Scoreboard</h3>
+              <button class="btn-text" id="reset-scores-btn">Reset</button>
+            </div>
+            <div class="card-body scoreboard-grid">
+              <div class="score-block" id="score-p1-block">
+                <span class="score-label" id="score-p1-label">Player 1</span>
+                <span class="score-val" id="score-p1">0</span>
+              </div>
+              <div class="score-block" id="score-ties-block">
+                <span class="score-label">Ties</span>
+                <span class="score-val" id="score-ties">0</span>
+              </div>
+              <div class="score-block" id="score-p2-block">
+                <span class="score-label" id="score-p2-label">Computer</span>
+                <span class="score-val" id="score-p2">0</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Move History / Time Travel -->
+          <div class="card glass-card moves-card">
+            <div class="card-header">
+              <h3><i data-lucide="history"></i> Match Move Log</h3>
+              <button class="btn-secondary btn-small-text hidden" id="undo-btn">
+                <i data-lucide="undo-2"></i> Undo
+              </button>
+            </div>
+            <div class="card-body">
+              <div class="timeline-container">
+                <div class="timeline-status" id="timeline-status">Game started</div>
+                <ol class="timeline-list" id="timeline-list">
+                  <!-- Dynamically populated moves list -->
+                </ol>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>&copy; 2026 ApexToe. Interactive time-travel, smart AI & audio synthesis.</p>
+    </footer>
+  </div>
+
+  <script src="index.js"></script>
+</body>
+</html>
